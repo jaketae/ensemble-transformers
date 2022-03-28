@@ -22,7 +22,7 @@ setup(
     author="Jake Tae",
     author_email="jaesungtae@gmail.com",
     install_requires=install_requires,
-    packages=find_packages(exclude=["docs", "tests"])
+    packages=find_packages(exclude=["docs", "tests"]),
     python_requires=">=3.7",
     classifiers=[
         "Programming Language :: Python :: 3.7",
