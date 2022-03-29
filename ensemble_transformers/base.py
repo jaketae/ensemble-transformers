@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import List, Union
+from typing import List, Optional, Union
 
 import torch
 from torch import nn
@@ -33,7 +33,9 @@ class EnsembleBaseModel(PreTrainedModel):
             self.devices[i] = device
 
     @classmethod
-    def from_multiple_pretrained(cls, *model_names: str, **kwargs) -> PreTrainedModel:
+    def from_multiple_pretrained(
+        cls, *model_names: str, weights: Optional[List[float]] = None, **kwargs
+    ) -> PreTrainedModel:
         class_name = cls.__name__
         if "For" not in class_name:
             raise RuntimeError(
@@ -41,7 +43,7 @@ class EnsembleBaseModel(PreTrainedModel):
             )
         _, suffix = class_name.split("For")
         auto_class = f"AutoModelFor{suffix}"
-        config = EnsembleConfig(auto_class, model_names)
+        config = EnsembleConfig(auto_class, model_names, weights=weights)
         return cls(config, **kwargs)
 
     @abstractmethod

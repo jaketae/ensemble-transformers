@@ -1,4 +1,8 @@
+from typing import List, Union
+
+import numpy as np
 import torch
+from PIL.Image import Image
 
 from ensemble_transformers.base import EnsembleBaseModel
 
@@ -6,10 +10,10 @@ from ensemble_transformers.base import EnsembleBaseModel
 class EnsembleModelForSequenceClassification(EnsembleBaseModel):
     def forward(
         self,
-        text,
-        main_device="cpu",
-        return_all_outputs=False,
-        preprocessor_kwargs={"return_tensors": "pt", "padding": True},
+        text: List[str],
+        main_device: Union[str, torch.device] = "cpu",
+        return_all_outputs: bool = False,
+        preprocessor_kwargs: dict = {"return_tensors": "pt", "padding": True},
     ):
         outputs = []
         for i, (model, preprocessor) in enumerate(zip(self.models, self.preprocessors)):
@@ -18,16 +22,18 @@ class EnsembleModelForSequenceClassification(EnsembleBaseModel):
             outputs.append(output)
         if return_all_outputs:
             return outputs
-        return torch.stack([output.logits.to(main_device) for output in outputs]).mean(dim=0)
+        return torch.stack(
+            [weight * output.logits.to(main_device) for weight, output in zip(self.config.weights, outputs)]
+        ).sum(dim=0)
 
 
 class EnsembleModelForImageClassification(EnsembleBaseModel):
     def forward(
         self,
-        images,
-        main_device="cpu",
-        return_all_outputs=False,
-        preprocessor_kwargs={"return_tensors": "pt"},
+        images: List[Image],
+        main_device: Union[str, torch.device] = "cpu",
+        return_all_outputs: bool = False,
+        preprocessor_kwargs: dict = {"return_tensors": "pt"},
     ):
         outputs = []
         for i, (model, preprocessor) in enumerate(zip(self.models, self.preprocessors)):
@@ -36,16 +42,18 @@ class EnsembleModelForImageClassification(EnsembleBaseModel):
             outputs.append(output)
         if return_all_outputs:
             return outputs
-        return torch.stack([output.logits.to(main_device) for output in outputs]).mean(dim=0)
+        return torch.stack(
+            [weight * output.logits.to(main_device) for weight, output in zip(self.config.weights, outputs)]
+        ).sum(dim=0)
 
 
 class EnsembleModelForAudioClassification(EnsembleBaseModel):
     def forward(
         self,
-        audio,
-        main_device="cpu",
-        return_all_outputs=False,
-        preprocessor_kwargs={"return_tensors": "pt", "sampling_rate": None, "padding": "longest"},
+        audio: np.ndarray,
+        main_device: Union[str, torch.device] = "cpu",
+        return_all_outputs: bool = False,
+        preprocessor_kwargs: dict = {"return_tensors": "pt", "sampling_rate": None, "padding": "longest"},
     ):
         outputs = []
         for i, (model, preprocessor) in enumerate(zip(self.models, self.preprocessors)):
@@ -54,4 +62,6 @@ class EnsembleModelForAudioClassification(EnsembleBaseModel):
             outputs.append(output)
         if return_all_outputs:
             return outputs
-        return torch.stack([output.logits.to(main_device) for output in outputs]).mean(dim=0)
+        return torch.stack(
+            [weight * output.logits.to(main_device) for weight, output in zip(self.config.weights, outputs)]
+        ).sum(dim=0)
