@@ -31,7 +31,7 @@ tensor([[ 0.2858, -0.0892],
 
 ## Usage
 
-### Configuration
+### Ensembling with Configuration
 
 To declare an ensemble, first create a configuration object specifying the Hugging Face transformers auto class, as well as the list of models to use to create the ensemble. 
 
@@ -50,7 +50,7 @@ The ensemble model can then be declared via
 ensemble = EnsembleModelForSequenceClassification(config)
 ```
 
-### `from_pretrained_multiple`
+### Ensembling with `from_multiple_pretrained`
 
 A more convenient way of declaring an ensemble is via `from_multiple_pretrained`, a method similar to `from_pretrained` in Hugging Face transformers. For instance, to perform text classification, we can use the `EnsembleModelForSequenceClassification` class.
 
@@ -73,7 +73,7 @@ In the example below, we see that the `ensemble` object correctly holds 3 tokeni
 [PreTrainedTokenizerFast(name_or_path='bert-base-uncased', vocab_size=30522, model_max_len=512, is_fast=True, padding_side='right', truncation_side='right', special_tokens={'unk_token': '[UNK]', 'sep_token': '[SEP]', 'pad_token': '[PAD]', 'cls_token': '[CLS]', 'mask_token': '[MASK]'}), PreTrainedTokenizerFast(name_or_path='distilroberta-base', vocab_size=50265, model_max_len=512, is_fast=True, padding_side='right', truncation_side='right', special_tokens={'bos_token': '<s>', 'eos_token': '</s>', 'unk_token': '<unk>', 'sep_token': '</s>', 'pad_token': '<pad>', 'cls_token': '<s>', 'mask_token': AddedToken("<mask>", rstrip=False, lstrip=True, single_word=False, normalized=False)}), PreTrainedTokenizerFast(name_or_path='xlnet-base-cased', vocab_size=32000, model_max_len=1000000000000000019884624838656, is_fast=True, padding_side='left', truncation_side='right', special_tokens={'bos_token': '<s>', 'eos_token': '</s>', 'unk_token': '<unk>', 'sep_token': '<sep>', 'pad_token': '<pad>', 'cls_token': '<cls>', 'mask_token': AddedToken("<mask>", rstrip=False, lstrip=True, single_word=False, normalized=False), 'additional_special_tokens': ['<eop>', '<eod>']})]
 ```
 
-### Note on Heterogenous Modality
+### Heterogenous Modality
 
 For the majority of use cases, it does not make sense to ensemble models from different modalities, e.g., a language model and an image model. As mentioned, Ensemble Transformers will auto-detect the modality of each model and prevent unintended mixing of models.
 
