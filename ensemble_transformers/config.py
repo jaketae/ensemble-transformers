@@ -42,7 +42,7 @@ class EnsembleConfig(PretrainedConfig):
         try:
             self.auto_class = getattr(transformers, auto_class)
         except AttributeError:
-            raise ImportError(f"Failed to import `{auto_class}` from `transformers`.")
+            raise ImportError(f"Failed to import `{auto_class}` from Hugging Face transformers.")
         preprocessor_classes = check_modalities(model_names)
         if len(preprocessor_classes) > 1:
             raise ValueError("Cannot ensemble models of different modalities.")
