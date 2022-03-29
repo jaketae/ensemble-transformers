@@ -31,7 +31,7 @@ class EnsembleBaseModel(PreTrainedModel):
             self.devices[i] = device
 
     @classmethod
-    def from_multiple_pretrained(cls, *model_names, **kwargs):
+    def from_multiple_pretrained(cls, *model_names: str, **kwargs) -> PreTrainedModel:
         class_name = cls.__name__
         if "For" not in class_name:
             raise RuntimeError(

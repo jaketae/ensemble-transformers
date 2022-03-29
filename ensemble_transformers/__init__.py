@@ -1,2 +1,2 @@
 # flake8: noqa
-from .ensemble import EnsembleModelForSequenceClassification
+from .ensemble import EnsembleModelForSequenceClassification, EnsembleModelForImageClassification, EnsembleModelForAudioClassification

@@ -6,34 +6,23 @@ from transformers import AutoFeatureExtractor, AutoProcessor, AutoTokenizer, Pre
 
 
 def detect_preprocessor_from_model_name(model_name: str) -> str:
-    for preprocessor_class in [AutoTokenizer, AutoFeatureExtractor, AutoProcessor]:
+    for preprocessor_class in [AutoFeatureExtractor, AutoProcessor, AutoTokenizer]:
         try:
             _ = preprocessor_class.from_pretrained(model_name)
             return preprocessor_class
         except KeyError:
             continue
     raise ValueError(
-        "Unable to auto-detect modality. Please consider opening an issue at https://github.com/jaketae/ensemble-transformers/issues."
+        "Unable to auto-detect preprocessor class. Please consider opening an issue at https://github.com/jaketae/ensemble-transformers/issues."
     )
 
 
-def detect_preprocessor_from_auto_class(auto_class: str) -> str:
-    auto_class = auto_class.lower()
-    for vision_keyword in ["image", "vision", "object", "segmentation"]:
-        if vision_keyword in auto_class:
-            return AutoFeatureExtractor
-    for audio_keyword in ["audio", "ctc", "speech"]:
-        if audio_keyword in auto_class:
-            return AutoProcessor
-    return AutoTokenizer
-
-
-def check_modalities(model_names):
+def check_modalities(model_names: List[str]) -> set:
     return set([detect_preprocessor_from_model_name(model_name) for model_name in model_names])
 
 
 class EnsembleConfig(PretrainedConfig):
-    def __init__(self, auto_class: str, model_names: List[str], *args, **kwargs):
+    def __init__(self, auto_class: str, model_names: List[str], *args, **kwargs) -> PretrainedConfig:
         if len(model_names) == 1:
             warnings.warn(
                 "Initializing ensemble with one model. "
@@ -48,11 +37,4 @@ class EnsembleConfig(PretrainedConfig):
             raise ValueError("Cannot ensemble models of different modalities.")
         self.model_names = model_names
         self.preprocessor_class = preprocessor_classes.pop()
-        preprocessor_class_from_auto_class = detect_preprocessor_from_auto_class(auto_class)
-        if self.preprocessor_class != preprocessor_class_from_auto_class:
-            raise ValueError(
-                f"Expected `auto_class` and `model_names` to point to the same modality, "
-                f"but got {preprocessor_class_from_auto_class.__name__} from `auto_class` "
-                f"and {self.preprocessor_class.__name__} from `model_names`."
-            )
         super().__init__(*args, **kwargs)
