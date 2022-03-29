@@ -14,7 +14,22 @@ Ensemble Transformers is available on [PyPI](https://pypi.org/project/ensemble-t
 pip install ensemble-transformers
 ```
 
-## Getting Started
+## Quickstart
+
+Import an ensemble model class according to your use case, specify the list of backbone models to use, and run training or inference right away.
+
+```python
+>>> from ensemble_transformers import EnsembleModelForSequenceClassification
+>>> ensemble = EnsembleModelForSequenceClassification.from_multiple_pretrained(
+    "bert-base-uncased", "distilroberta-base", "xlnet-base-cased"
+)
+>>> batch = ["This is a test sentence", "This is another test sentence."]
+>>> ensemble(batch)
+tensor([[ 0.2858, -0.0892],
+        [ 0.2437, -0.0338]], grad_fn=<MeanBackward1>)
+```
+
+## Usage
 
 ### Configuration
 
