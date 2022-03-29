@@ -16,7 +16,7 @@ pip install ensemble-transformers
 
 ## Getting Started
 
-### Declaring an Ensemble
+### Configuration
 
 To declare an ensemble, first create a configuration object specifying the Hugging Face transformers auto class, as well as the list of models to use to create the ensemble. 
 
@@ -35,7 +35,7 @@ The ensemble model can then be declared via
 ensemble = EnsembleModelForSequenceClassification(config)
 ```
 
-### `from_multiple_pretrained`
+### `from_pretrained_multiple`
 
 A more convenient way of declaring an ensemble is via `from_multiple_pretrained`, a method similar to `from_pretrained` in Hugging Face transformers. For instance, to perform text classification, we can use the `EnsembleModelForSequenceClassification` class.
 
@@ -72,6 +72,22 @@ Traceback (most recent call last):
 ValueError: Cannot ensemble models of different modalities.
 ```
 
+### Loading Across Devices
+
+Because ensembling involves multiple models, it is often impossible to load all models onto a single device. To alleviate memory requirements, Ensemble Transformers offers a way of distributing models across different devices. For instance, say you have access to multiple GPU cards and want to load each model onto different GPUs. This can easily be achieved by the following line.
+
+```python
+ensemble.to_multiple(
+    ["cuda:0", "cuda:1", "cuda:2"]
+)
+```
+
+The familiar `to(device)` method is also supported, and it loads all models onto the same device.
+
+```python
+ensemble.to("cuda")
+```
+
 ### Forward Propagation
 
 To run forward propagation, simply pass a batch of raw input to the ensemble. In the case of language models, this is just a batch of text.
@@ -83,7 +99,9 @@ tensor([[ 0.2858, -0.0892],
         [ 0.2437, -0.0338]], grad_fn=<MeanBackward1>)
 ```
 
-By default, the ensemble returns the mean logits, that is, logits from each model is averaged to produce a final pooled output. If you want to obtain the output from each model, you can set `return_all_outputs=True` in the forward call.
+By default, the ensemble returns the mean logits, that is, logits from each model is averaged to produce a final pooled output. If the models are spread across different devices, the result is collected in `main_device`, which defaults to the CPU.
+
+If you want to obtain the output from each model instead of averaged logits, you can set `return_all_outputs=True` in the forward call.
 
 ```python
 >>> ensemble(batch, return_all_outputs=True)
@@ -99,6 +117,8 @@ By default, the ensemble returns the mean logits, that is, logits from each mode
 
 In the example above, we obtain a list containing three `SequenceClassifierOutput`s, one for each model.
 
+### Preprocessor Arguments
+
 Preprocessors accept a number of optional arguments. For instance, for simple batching, `padding=True` is used. Moreover, PyTorch models require `return_tensors="pt"`. Ensemble Transformers already ships with minimal, sensible defaults so that it works out-of-the-box. However, for more custom behavior, you can modify the `preprocessor_kwargs` argument. The example below demonstrates how to use TensorFlow language models without padding.
 
 ```python
@@ -111,4 +131,4 @@ This repository is under active development. Any and all issues and pull request
 
 ## License
 
-Released under the MIT License.
+Released under the [MIT License](LICENSE).
