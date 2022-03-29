@@ -10,7 +10,7 @@ def detect_preprocessor_from_model_name(model_name: str) -> str:
         try:
             _ = preprocessor_class.from_pretrained(model_name)
             return preprocessor_class
-        except KeyError:
+        except (OSError, KeyError, ValueError):
             continue
     raise ValueError(
         "Unable to auto-detect preprocessor class. Please consider opening an issue at https://github.com/jaketae/ensemble-transformers/issues."
