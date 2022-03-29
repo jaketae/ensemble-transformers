@@ -1,20 +1,9 @@
 import torch
-from transformers import AutoModelForSequenceClassification
 
-from ensemble_transformers.base import EnsembleBaseModel, EnsembleConfig
+from ensemble_transformers.base import EnsembleBaseModel
 
 
 class EnsembleModelForSequenceClassification(EnsembleBaseModel):
-    def __init__(self, config, *args, **kwargs):
-        super().__init__(config)
-        for model_name in config.model_names:
-            self.models.append(AutoModelForSequenceClassification.from_pretrained(model_name, *args, **kwargs))
-
-    @classmethod
-    def from_pretrained(cls, model_names, *args, **kwargs):
-        config = EnsembleConfig(model_names=model_names, modality="text")
-        return cls(config, *args, **kwargs)
-
     def forward(
         self,
         text,
