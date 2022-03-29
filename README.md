@@ -11,7 +11,16 @@ Ensembling is a simple yet powerful way of combining predictions from different 
 Ensemble Transformers is available on [PyPI](https://pypi.org/project/ensemble-transformers/) and can easily be installed with the `pip` package manager.
 
 ```
+pip install -U pip wheel
 pip install ensemble-transformers
+```
+
+To try out the latest features, clone this repository and install from source.
+
+```
+git clone https://github.com/jaketae/ensemble-transformers.git
+cd ensemble-transformers
+pip install -e .
 ```
 
 ## Quickstart
