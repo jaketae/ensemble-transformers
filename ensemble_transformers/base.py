@@ -26,6 +26,8 @@ class EnsembleBaseModel(PreTrainedModel):
         self.devices = [device for _ in range(self.num_models)]
 
     def to_multiple(self, devices: List[Union[str, torch.device]]) -> None:
+        if len(devices) != self.num_models:
+            raise ValueError(f"Expected {self.num_models} devices, but got {len(devices)} instead.")
         for i, (model, device) in enumerate(zip(self.models, devices)):
             model.to(device)
             self.devices[i] = device
