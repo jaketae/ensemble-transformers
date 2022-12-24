@@ -33,9 +33,20 @@ Import an ensemble model class according to your use case, specify the list of b
     "bert-base-uncased", "distilroberta-base", "xlnet-base-cased"
 )
 >>> batch = ["This is a test sentence", "This is another test sentence."]
->>> ensemble(batch)
-tensor([[ 0.2858, -0.0892],
-        [ 0.2437, -0.0338]], grad_fn=<MeanBackward1>)
+>>> output = ensemble(batch)
+>>> output
+EnsembleModelOutput(
+        logits: [tensor([[ 0.2430, -0.0581],
+        [ 0.2145, -0.0541]], grad_fn=<AddmmBackward0>), tensor([[-0.0094, -0.0117],
+        [-0.0118, -0.0046]], grad_fn=<AddmmBackward0>), tensor([[-0.0962, -1.1581],
+        [-0.2195, -0.7422]], grad_fn=<AddmmBackward0>)],
+)
+>>> stacked_output = ensemble(batch, mean_pool=True)
+>>> stacked_output
+EnsembleModelOutput(
+        logits: tensor([[ 0.0458, -0.4093],
+        [-0.0056, -0.2670]], grad_fn=<SumBackward1>),
+)
 ```
 
 ## Usage
@@ -118,14 +129,31 @@ To run forward propagation, simply pass a batch of raw input to the ensemble. In
 
 ```python
 >>> batch = ["This is a test sentence", "This is another test sentence."]
->>> ensemble(batch)
-tensor([[ 0.2858, -0.0892],
-        [ 0.2437, -0.0338]], grad_fn=<MeanBackward1>)
+>>> output = ensemble(batch)
+>>> output
+EnsembleModelOutput(
+        logits: [tensor([[ 0.2430, -0.0581],
+        [ 0.2145, -0.0541]], grad_fn=<AddmmBackward0>), tensor([[-0.0094, -0.0117],
+        [-0.0118, -0.0046]], grad_fn=<AddmmBackward0>), tensor([[-0.0962, -1.1581],
+        [-0.2195, -0.7422]], grad_fn=<AddmmBackward0>)]
+)
 ```
 
-By default, the ensemble returns the mean logits, that is, logits from each model is averaged to produce a final pooled output. If the models are spread across different devices, the result is collected in `main_device`, which defaults to the CPU.
+By default, the ensemble returns a `EnsembleModelOutput` instance, which contains all the outputs from each model. The raw outputs from each model is accessible via the `.outputs` field. The `EnsembleModelOutput` class also scans across each of the raw output and collects common keys. In the example above, all model outputs contained a `.logits` field, which is why it appears as a field in the `output` instance.
 
-If you want to obtain the output from each model instead of averaged logits, you can set `return_all_outputs=True` in the forward call.
+We can also stack or mean-pool the output of each model by toggling `mean_pool=True` in the forward call.
+
+```python
+>>> stacked_output = ensemble(batch, mean_pool=True)
+>>> stacked_output
+EnsembleModelOutput(
+        logits: tensor([[ 0.0458, -0.4093],
+        [-0.0056, -0.2670]], grad_fn=<SumBackward1>),
+)
+```
+
+If the models are spread across different devices, the result is collected in `main_device`, which defaults to the CPU.
+
 
 ```python
 >>> ensemble(batch, return_all_outputs=True)

@@ -29,8 +29,9 @@ class EnsembleModelOutput:
             )
 
     def __repr__(self) -> str:
-        result = []
+        result = ["EnsembleModelOutput("]
         for common_key in self.common_keys:
             value = getattr(self, common_key)
-            result.append(f"{common_key}: {repr(value)}")
+            result.append(f"\t{common_key}: {repr(value)},")
+        result.append(")")
         return "\n".join(result)

@@ -47,7 +47,7 @@ class EnsembleBaseModel(PreTrainedModel):
         return cls(config, **kwargs)
 
     def forward(
-        self, inputs, preprocessor_kwargs: dict, return_all_outputs: bool, main_device: Union[str, torch.device]
+        self, inputs, preprocessor_kwargs: dict, mean_pool: bool, main_device: Union[str, torch.device]
     ) -> EnsembleModelOutput:
         outputs = []
         for i, (model, preprocessor) in enumerate(zip(self.models, self.preprocessors)):
@@ -55,7 +55,7 @@ class EnsembleBaseModel(PreTrainedModel):
             output = model(**preprocessed)
             outputs.append(output)
         ensemble_output = EnsembleModelOutput(outputs)
-        if return_all_outputs:
+        if not mean_pool:
             return ensemble_output
         ensemble_output.stack(self.config.weights, main_device)
         return ensemble_output

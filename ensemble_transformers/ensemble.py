@@ -12,10 +12,10 @@ class EnsembleModelForSequenceClassification(EnsembleBaseModel):
         self,
         text: List[str],
         preprocessor_kwargs: dict = {"return_tensors": "pt", "padding": True},
-        return_all_outputs: bool = True,
+        mean_pool: bool = False,
         main_device: Union[str, torch.device] = "cpu",
     ):
-        return super().forward(text, preprocessor_kwargs, return_all_outputs, main_device)
+        return super().forward(text, preprocessor_kwargs, mean_pool, main_device)
 
 
 class EnsembleModelForImageClassification(EnsembleBaseModel):
@@ -23,10 +23,10 @@ class EnsembleModelForImageClassification(EnsembleBaseModel):
         self,
         images: List[Image],
         preprocessor_kwargs: dict = {"return_tensors": "pt"},
-        return_all_outputs: bool = True,
+        mean_pool: bool = False,
         main_device: Union[str, torch.device] = "cpu",
     ):
-        return super().forward(images, preprocessor_kwargs, return_all_outputs, main_device)
+        return super().forward(images, preprocessor_kwargs, mean_pool, main_device)
 
 
 class EnsembleModelForAudioClassification(EnsembleBaseModel):
@@ -34,7 +34,7 @@ class EnsembleModelForAudioClassification(EnsembleBaseModel):
         self,
         audio: np.ndarray,
         preprocessor_kwargs: dict = {"return_tensors": "pt", "sampling_rate": None, "padding": "longest"},
-        return_all_outputs: bool = True,
+        mean_pool: bool = False,
         main_device: Union[str, torch.device] = "cpu",
     ):
-        return super().forward(audio, preprocessor_kwargs, return_all_outputs, main_device)
+        return super().forward(audio, preprocessor_kwargs, mean_pool, main_device)
