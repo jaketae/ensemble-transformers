@@ -50,7 +50,11 @@ class EnsembleConfig(PretrainedConfig):
                     f"but got {len(weights)} elements instead."
                 )
             weight_sum = sum(weights)
-            self.weights = [weight / weight_sum for weight in weights]
+            if weight_sum != 1:
+                warnings.warn("Normalizing `weights` to sum to 1.")
+                self.weights = [weight / weight_sum for weight in weights]
+            else:
+                self.weights = weights
         else:
             self.weights = [1 / num_models for _ in range(num_models)]
         self.model_names = model_names
