@@ -11,57 +11,30 @@ class EnsembleModelForSequenceClassification(EnsembleBaseModel):
     def forward(
         self,
         text: List[str],
-        main_device: Union[str, torch.device] = "cpu",
-        return_all_outputs: bool = False,
         preprocessor_kwargs: dict = {"return_tensors": "pt", "padding": True},
+        mean_pool: bool = False,
+        main_device: Union[str, torch.device] = "cpu",
     ):
-        outputs = []
-        for i, (model, preprocessor) in enumerate(zip(self.models, self.preprocessors)):
-            inputs = preprocessor(text, **preprocessor_kwargs).to(self.devices[i])
-            output = model(**inputs)
-            outputs.append(output)
-        if return_all_outputs:
-            return outputs
-        return torch.stack(
-            [weight * output.logits.to(main_device) for weight, output in zip(self.config.weights, outputs)]
-        ).sum(dim=0)
+        return super().forward(text, preprocessor_kwargs, mean_pool, main_device)
 
 
 class EnsembleModelForImageClassification(EnsembleBaseModel):
     def forward(
         self,
         images: List[Image],
-        main_device: Union[str, torch.device] = "cpu",
-        return_all_outputs: bool = False,
         preprocessor_kwargs: dict = {"return_tensors": "pt"},
+        mean_pool: bool = False,
+        main_device: Union[str, torch.device] = "cpu",
     ):
-        outputs = []
-        for i, (model, preprocessor) in enumerate(zip(self.models, self.preprocessors)):
-            inputs = preprocessor(images, **preprocessor_kwargs).to(self.devices[i])
-            output = model(**inputs)
-            outputs.append(output)
-        if return_all_outputs:
-            return outputs
-        return torch.stack(
-            [weight * output.logits.to(main_device) for weight, output in zip(self.config.weights, outputs)]
-        ).sum(dim=0)
+        return super().forward(images, preprocessor_kwargs, mean_pool, main_device)
 
 
 class EnsembleModelForAudioClassification(EnsembleBaseModel):
     def forward(
         self,
         audio: np.ndarray,
-        main_device: Union[str, torch.device] = "cpu",
-        return_all_outputs: bool = False,
         preprocessor_kwargs: dict = {"return_tensors": "pt", "sampling_rate": None, "padding": "longest"},
+        mean_pool: bool = False,
+        main_device: Union[str, torch.device] = "cpu",
     ):
-        outputs = []
-        for i, (model, preprocessor) in enumerate(zip(self.models, self.preprocessors)):
-            inputs = preprocessor(audio, **preprocessor_kwargs).to(self.devices[i])
-            output = model(**inputs)
-            outputs.append(output)
-        if return_all_outputs:
-            return outputs
-        return torch.stack(
-            [weight * output.logits.to(main_device) for weight, output in zip(self.config.weights, outputs)]
-        ).sum(dim=0)
+        return super().forward(audio, preprocessor_kwargs, mean_pool, main_device)

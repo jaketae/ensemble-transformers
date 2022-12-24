@@ -1,6 +1,6 @@
 .PHONY: quality style
 
-check_dirs := ensemble_transformers
+check_dirs := ensemble_transformers tests
 
 quality: # Check that source code meets quality standards
 	black --check $(check_dirs)

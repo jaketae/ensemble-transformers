@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from typing import List, Optional, Union
 
 import torch
@@ -6,6 +5,7 @@ from torch import nn
 from transformers import PreTrainedModel
 
 from .config import EnsembleConfig
+from .output import EnsembleModelOutput
 
 
 class EnsembleBaseModel(PreTrainedModel):
@@ -46,6 +46,16 @@ class EnsembleBaseModel(PreTrainedModel):
         config = EnsembleConfig(auto_class, model_names, weights=weights)
         return cls(config, **kwargs)
 
-    @abstractmethod
-    def forward(self, *args, **kwargs):
-        pass
+    def forward(
+        self, inputs, preprocessor_kwargs: dict, mean_pool: bool, main_device: Union[str, torch.device]
+    ) -> EnsembleModelOutput:
+        outputs = []
+        for i, (model, preprocessor) in enumerate(zip(self.models, self.preprocessors)):
+            preprocessed = preprocessor(inputs, **preprocessor_kwargs).to(self.devices[i])
+            output = model(**preprocessed)
+            outputs.append(output)
+        ensemble_output = EnsembleModelOutput(outputs)
+        if not mean_pool:
+            return ensemble_output
+        ensemble_output.stack(self.config.weights, main_device)
+        return ensemble_output
