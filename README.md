@@ -137,6 +137,15 @@ EnsembleModelOutput(
         [-0.0118, -0.0046]], grad_fn=<AddmmBackward0>), tensor([[-0.0962, -1.1581],
         [-0.2195, -0.7422]], grad_fn=<AddmmBackward0>)]
 )
+>>> output.outputs
+[SequenceClassifierOutput(loss=None, logits=tensor([[ 0.1681, -0.3470],
+        [ 0.1573, -0.1571]], grad_fn=<AddmmBackward0>), hidden_states=None, attentions=None), SequenceClassifierOutput(loss=None, logits=tensor([[ 0.1388, -0.0711],
+        [ 0.1429, -0.0841]], grad_fn=<AddmmBackward0>), hidden_states=None, attentions=None), XLNetForSequenceClassificationOutput(loss=None, logits=tensor([[0.5506, 0.1506],
+        [0.4308, 0.1397]], grad_fn=<AddmmBackward0>), mems=(tensor([[[ 0.0344,  0.0202,  0.0261,  ..., -0.0175, -0.0343,  0.0252],
+         [-0.0281, -0.0198, -0.0387,  ..., -0.0420, -0.0160, -0.0253]],
+       ...,
+        [[ 0.2468, -0.4007, -1.0839,  ..., -0.2943, -0.3944,  0.0605],
+         [ 0.1970,  0.2106, -0.1448,  ..., -0.6331, -0.0655,  0.7427]]])), hidden_states=None, attentions=None)]
 ```
 
 By default, the ensemble returns a `EnsembleModelOutput` instance, which contains all the outputs from each model. The raw outputs from each model is accessible via the `.outputs` field. The `EnsembleModelOutput` class also scans across each of the raw output and collects common keys. In the example above, all model outputs contained a `.logits` field, which is why it appears as a field in the `output` instance.
@@ -153,21 +162,6 @@ EnsembleModelOutput(
 ```
 
 If the models are spread across different devices, the result is collected in `main_device`, which defaults to the CPU.
-
-
-```python
->>> ensemble(batch, return_all_outputs=True)
-[SequenceClassifierOutput(loss=None, logits=tensor([[ 0.1681, -0.3470],
-        [ 0.1573, -0.1571]], grad_fn=<AddmmBackward0>), hidden_states=None, attentions=None), SequenceClassifierOutput(loss=None, logits=tensor([[ 0.1388, -0.0711],
-        [ 0.1429, -0.0841]], grad_fn=<AddmmBackward0>), hidden_states=None, attentions=None), XLNetForSequenceClassificationOutput(loss=None, logits=tensor([[0.5506, 0.1506],
-        [0.4308, 0.1397]], grad_fn=<AddmmBackward0>), mems=(tensor([[[ 0.0344,  0.0202,  0.0261,  ..., -0.0175, -0.0343,  0.0252],
-         [-0.0281, -0.0198, -0.0387,  ..., -0.0420, -0.0160, -0.0253]],
-       ...,
-        [[ 0.2468, -0.4007, -1.0839,  ..., -0.2943, -0.3944,  0.0605],
-         [ 0.1970,  0.2106, -0.1448,  ..., -0.6331, -0.0655,  0.7427]]])), hidden_states=None, attentions=None)]
-```
-
-In the example above, we obtain a list containing three `SequenceClassifierOutput`s, one for each model.
 
 ### Preprocessor Arguments
 
